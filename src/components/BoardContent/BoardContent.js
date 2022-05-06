@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import Column from 'components/Column/Column'
 import { mapOrder } from 'utilities/sorts'
 import { applyDrag } from 'utilities/dragDrop'
@@ -16,10 +16,14 @@ function BoardContent() {
   const [columns, setColumns] = useState([])
   const [openNewColumnForm, setOpenNewColumnForm] = useState(false)
 
+  const toggleOpenNewColumnForm = () => {
+    setOpenNewColumnForm(!openNewColumnForm)
+  }
+
   const newColumnInputRef = useRef(null)
 
   const [newColumnTitle, setNewColumnTitle] = useState('')
-  const onNewColumnTitleChange = useCallback((e) => setNewColumnTitle(e.target.value), [])
+  const onNewColumnTitleChange = (e) => setNewColumnTitle(e.target.value)
 
   useEffect(() => {
     const boardFromDB = initalData.boards.find(board => board.id === 'board-1')
@@ -65,9 +69,6 @@ function BoardContent() {
     }
   }
 
-  const toggleOpenNewColumnForm = () => {
-    setOpenNewColumnForm(!openNewColumnForm)
-  }
 
   const addNewColumn = () => {
     if (!newColumnTitle) {
@@ -120,6 +121,7 @@ function BoardContent() {
     setBoard(newBoard)
   }
 
+
   return (
     <div className='board-content'>
       <Container
@@ -136,7 +138,11 @@ function BoardContent() {
       >
         {columns.map((column, index) => (
           <Draggable key={index}>
-            <Column column={column} onCardDrop={onCardDrop} onUpdateColumn={onUpdateColumn} />
+            <Column
+              column={column}
+              onCardDrop={onCardDrop}
+              onUpdateColumn={onUpdateColumn}
+            />
           </Draggable>
         ))}
       </Container>
@@ -168,7 +174,7 @@ function BoardContent() {
                Add column
                </Button>{' '}
 
-               <span className='cancel-new-column' onClick={toggleOpenNewColumnForm}>
+               <span className='cancel-icon' onClick={toggleOpenNewColumnForm}>
                  <i className='fa fa-trash icon'></i>
                </span>
              </Col>

@@ -58,21 +58,19 @@
 
     input.input-enter-new-column {
       margin: 5px 0;
-      &:focus {
-        border-color: $input-border-color;
-      }
+      
     }
 
-    span.cancel-new-column {
-      margin-left: $gap;
-      cursor: pointer;
-      i {
-        font-size: 18px;
-        color: $alert-danger;
-        &:hover {
-          color: darken($color: $alert-danger, $amount: 10);
-        }
-      }
-    }
+    // span.cancel-new-column {
+    //   margin-left: $gap;
+    //   cursor: pointer;
+    //   i {
+    //     font-size: 18px;
+    //     color: $alert-danger;
+    //     &:hover {
+    //       color: darken($color: $alert-danger, $amount: 10);
+    //     }
+    //   }
+    // }
   }
 }
