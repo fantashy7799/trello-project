@@ -4,12 +4,9 @@ import { mapOrder } from 'utilities/sorts'
 import { applyDrag } from 'utilities/dragDrop'
 import { Container, Draggable } from 'react-smooth-dnd'
 import { Container as BootstrapContainer, Row, Col, Form, Button } from 'react-bootstrap'
-
-import { initalData } from 'actions/initalData'
-
 import { isEmpty } from 'lodash'
-
 import './BoardContent.scss'
+import { fetchBoardDetails } from 'actions/ApiCall'
 
 function BoardContent() {
   const [board, setBoard] = useState({})
@@ -26,12 +23,12 @@ function BoardContent() {
   const onNewColumnTitleChange = (e) => setNewColumnTitle(e.target.value)
 
   useEffect(() => {
-    const boardFromDB = initalData.boards.find(board => board.id === 'board-1')
-
-    if (boardFromDB) {
-      setBoard(boardFromDB)
-      setColumns(mapOrder(boardFromDB.columns, boardFromDB.columOrder, 'id'))
-    }
+    const boardId = '6293d47694b1911810df6599'
+    fetchBoardDetails(boardId).then(board => {
+      console.log(board)
+      setBoard(board)
+      setColumns(mapOrder(board.columns, board.columnOrder, '_id'))
+    })
   }, [])
 
   useEffect(() => {
@@ -50,7 +47,7 @@ function BoardContent() {
     newColumns = applyDrag(newColumns, dropResult)
 
     let newBoard = { ...board }
-    newBoard.columOrder = newColumns.map(c => c.id)
+    newBoard.columnOrder = newColumns.map(c => c._id)
     newBoard.columns = newColumns
 
     setColumns(newColumns)
@@ -61,9 +58,9 @@ function BoardContent() {
     if (dropResult.removedIndex != null || dropResult.addedIndex != null) {
       let newColumns = [...columns]
 
-      let currentColumn = newColumns.find(c => c.id === columnId)
+      let currentColumn = newColumns.find(c => c._id === columnId)
       currentColumn.cards = applyDrag(currentColumn.cards, dropResult)
-      currentColumn.cardOrder = currentColumn.cards.map(i => i.id)
+      currentColumn.cardOrder = currentColumn.cards.map(i => i._id)
 
       setColumns(newColumns)
     }
@@ -78,7 +75,7 @@ function BoardContent() {
 
     const newColumnToAdd = {
       id: Math.random().toString(36).substr(2, 5), //5 random characters, will remove when we implement code api
-      boardID: board.id,
+      boardID: board._id,
       title: newColumnTitle.trim(),
       cardOrder: [],
       cards: []
@@ -88,7 +85,7 @@ function BoardContent() {
     newColumns.push(newColumnToAdd)
 
     let newBoard = { ...board }
-    newBoard.columOrder = newColumns.map(c => c.id)
+    newBoard.columnOrder = newColumns.map(c => c._id)
     newBoard.columns = newColumns
 
     setColumns(newColumns)
@@ -99,11 +96,11 @@ function BoardContent() {
   }
 
   const onUpdateColumn = (newColumnToUpdate) => {
-    const columnIdToUpdate = newColumnToUpdate.id
+    const columnIdToUpdate = newColumnToUpdate._id
 
     let newColumns = [...columns]
 
-    const columnIndexToUpdate = newColumns.findIndex(i => i.id ===columnIdToUpdate)
+    const columnIndexToUpdate = newColumns.findIndex(i => i._id ===columnIdToUpdate)
 
     if (newColumnToUpdate._destroy) {
       //remove column
@@ -114,7 +111,7 @@ function BoardContent() {
     }
 
     let newBoard = { ...board }
-    newBoard.columOrder = newColumns.map(c => c.id)
+    newBoard.columnOrder = newColumns.map(c => c._id)
     newBoard.columns = newColumns
 
     setColumns(newColumns)
