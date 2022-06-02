@@ -6,7 +6,7 @@ import { Container, Draggable } from 'react-smooth-dnd'
 import { Container as BootstrapContainer, Row, Col, Form, Button } from 'react-bootstrap'
 import { isEmpty } from 'lodash'
 import './BoardContent.scss'
-import { fetchBoardDetails } from 'actions/ApiCall'
+import { fetchBoardDetails, createNewColumn } from 'actions/ApiCall'
 
 function BoardContent() {
   const [board, setBoard] = useState({})
@@ -25,7 +25,6 @@ function BoardContent() {
   useEffect(() => {
     const boardId = '6293d47694b1911810df6599'
     fetchBoardDetails(boardId).then(board => {
-      console.log(board)
       setBoard(board)
       setColumns(mapOrder(board.columns, board.columnOrder, '_id'))
     })
@@ -66,7 +65,6 @@ function BoardContent() {
     }
   }
 
-
   const addNewColumn = () => {
     if (!newColumnTitle) {
       newColumnInputRef.current.focus()
@@ -74,28 +72,27 @@ function BoardContent() {
     }
 
     const newColumnToAdd = {
-      id: Math.random().toString(36).substr(2, 5), //5 random characters, will remove when we implement code api
-      boardID: board._id,
-      title: newColumnTitle.trim(),
-      cardOrder: [],
-      cards: []
+      boardId: board._id,
+      title: newColumnTitle.trim()
     }
 
-    let newColumns = [...columns]
-    newColumns.push(newColumnToAdd)
+    createNewColumn(newColumnToAdd).then(column => {
+      let newColumns = [...columns]
+      newColumns.push(column)
 
-    let newBoard = { ...board }
-    newBoard.columnOrder = newColumns.map(c => c._id)
-    newBoard.columns = newColumns
+      let newBoard = { ...board }
+      newBoard.columnOrder = newColumns.map(c => c._id)
+      newBoard.columns = newColumns
 
-    setColumns(newColumns)
-    setBoard(newBoard)
+      setColumns(newColumns)
+      setBoard(newBoard)
 
-    setNewColumnTitle('')
-    toggleOpenNewColumnForm()
+      setNewColumnTitle('')
+      toggleOpenNewColumnForm()
+    })
   }
 
-  const onUpdateColumn = (newColumnToUpdate) => {
+  const onUpdateColumnState = (newColumnToUpdate) => {
     const columnIdToUpdate = newColumnToUpdate._id
 
     let newColumns = [...columns]
@@ -138,7 +135,7 @@ function BoardContent() {
             <Column
               column={column}
               onCardDrop={onCardDrop}
-              onUpdateColumn={onUpdateColumn}
+              onUpdateColumnState={onUpdateColumnState}
             />
           </Draggable>
         ))}
